@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CustomerOrderTracker.Migrations
 {
     [DbContext(typeof(TrackerContext))]
-    [Migration("20260327145309_InitialCreate")]
+    [Migration("20260327185124_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

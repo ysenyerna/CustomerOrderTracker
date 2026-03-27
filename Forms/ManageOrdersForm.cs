@@ -1,11 +1,10 @@
 using System.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace CustomerOrderTracker;
 
-public partial class ManageCustomersForm : Form
+public partial class ManageOrdersForm : Form
 {
-    public ManageCustomersForm()
+    public ManageOrdersForm()
     {
         InitializeComponent();
 
@@ -17,11 +16,10 @@ public partial class ManageCustomersForm : Form
 		tbSearchName.TextChanged += SearchUpdated;
 
 		// Initialize DB
-		using var ctx = new TrackerContext();
-		ctx.Database.Migrate();
 		DisplayDb();
 		SelectionChanged(null, null);
 
+		using var ctx = new TrackerContext();
 		var list = ctx.Customers.ToList();
 		if (list.Count == 0)
 			UpdateStatus(

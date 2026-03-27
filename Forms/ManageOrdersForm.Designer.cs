@@ -1,6 +1,6 @@
 ﻿namespace CustomerOrderTracker;
 
-partial class ManageCustomersForm
+partial class ManageOrdersForm
 {
     /// <summary>
     ///  Required designer variable.
