@@ -30,13 +30,13 @@
         {
             tableLayoutPanel1 = new TableLayoutPanel();
             tableLayoutPanel2 = new TableLayoutPanel();
-            lblName = new Label();
-            lblEmail = new Label();
-            tbName = new TextBox();
-            tbEmail = new TextBox();
+            tbTotalAmount = new TextBox();
+            lblDate = new Label();
+            lblTotalAmount = new Label();
             tableLayoutPanel3 = new TableLayoutPanel();
-            btnCancel = new Button();
             btnConfirm = new Button();
+            btnCancel = new Button();
+            dtpDate = new DateTimePicker();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             tableLayoutPanel3.SuspendLayout();
@@ -62,10 +62,10 @@
             tableLayoutPanel2.ColumnCount = 2;
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle());
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Controls.Add(tbEmail, 1, 1);
-            tableLayoutPanel2.Controls.Add(lblName, 0, 0);
-            tableLayoutPanel2.Controls.Add(lblEmail, 0, 1);
-            tableLayoutPanel2.Controls.Add(tbName, 1, 0);
+            tableLayoutPanel2.Controls.Add(tbTotalAmount, 1, 1);
+            tableLayoutPanel2.Controls.Add(lblDate, 0, 0);
+            tableLayoutPanel2.Controls.Add(lblTotalAmount, 0, 1);
+            tableLayoutPanel2.Controls.Add(dtpDate, 1, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(3, 3);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -75,41 +75,33 @@
             tableLayoutPanel2.Size = new Size(419, 94);
             tableLayoutPanel2.TabIndex = 0;
             // 
-            // lblName
+            // tbTotalAmount
             // 
-            lblName.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            lblName.AutoSize = true;
-            lblName.Location = new Point(3, 16);
-            lblName.Name = "lblName";
-            lblName.Size = new Size(45, 15);
-            lblName.TabIndex = 0;
-            lblName.Text = "Name: ";
+            tbTotalAmount.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            tbTotalAmount.Location = new Point(94, 59);
+            tbTotalAmount.Name = "tbTotalAmount";
+            tbTotalAmount.Size = new Size(322, 23);
+            tbTotalAmount.TabIndex = 3;
             // 
-            // lblEmail
+            // lblDate
             // 
-            lblEmail.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            lblEmail.AutoSize = true;
-            lblEmail.Location = new Point(3, 63);
-            lblEmail.Name = "lblEmail";
-            lblEmail.Size = new Size(45, 15);
-            lblEmail.TabIndex = 1;
-            lblEmail.Text = "Email: ";
+            lblDate.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            lblDate.AutoSize = true;
+            lblDate.Location = new Point(3, 16);
+            lblDate.Name = "lblDate";
+            lblDate.Size = new Size(85, 15);
+            lblDate.TabIndex = 0;
+            lblDate.Text = "Date: ";
             // 
-            // tbName
+            // lblTotalAmount
             // 
-            tbName.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            tbName.Location = new Point(54, 12);
-            tbName.Name = "tbName";
-            tbName.Size = new Size(362, 23);
-            tbName.TabIndex = 2;
-            // 
-            // tbEmail
-            // 
-            tbEmail.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            tbEmail.Location = new Point(54, 59);
-            tbEmail.Name = "tbEmail";
-            tbEmail.Size = new Size(362, 23);
-            tbEmail.TabIndex = 3;
+            lblTotalAmount.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            lblTotalAmount.AutoSize = true;
+            lblTotalAmount.Location = new Point(3, 63);
+            lblTotalAmount.Name = "lblTotalAmount";
+            lblTotalAmount.Size = new Size(85, 15);
+            lblTotalAmount.TabIndex = 1;
+            lblTotalAmount.Text = "Total Amount: ";
             // 
             // tableLayoutPanel3
             // 
@@ -127,16 +119,6 @@
             tableLayoutPanel3.Size = new Size(419, 44);
             tableLayoutPanel3.TabIndex = 1;
             // 
-            // btnCancel
-            // 
-            btnCancel.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            btnCancel.Location = new Point(212, 10);
-            btnCancel.Name = "btnCancel";
-            btnCancel.Size = new Size(204, 23);
-            btnCancel.TabIndex = 0;
-            btnCancel.Text = "Cancel";
-            btnCancel.UseVisualStyleBackColor = true;
-            // 
             // btnConfirm
             // 
             btnConfirm.Anchor = AnchorStyles.Left | AnchorStyles.Right;
@@ -147,15 +129,33 @@
             btnConfirm.Text = "Confirm";
             btnConfirm.UseVisualStyleBackColor = true;
             // 
-            // Customer
+            // btnCancel
+            // 
+            btnCancel.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            btnCancel.Location = new Point(212, 10);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(204, 23);
+            btnCancel.TabIndex = 0;
+            btnCancel.Text = "Cancel";
+            btnCancel.UseVisualStyleBackColor = true;
+            // 
+            // dtpDate
+            // 
+            dtpDate.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            dtpDate.Location = new Point(94, 12);
+            dtpDate.Name = "dtpDate";
+            dtpDate.Size = new Size(322, 23);
+            dtpDate.TabIndex = 4;
+            // 
+            // OrderForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(425, 148);
             Controls.Add(tableLayoutPanel1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
-            Name = "Customer";
-            Text = "Customer";
+            Name = "OrderForm";
+            Text = "Order";
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel2.ResumeLayout(false);
             tableLayoutPanel2.PerformLayout();
@@ -167,12 +167,12 @@
 
         private TableLayoutPanel tableLayoutPanel1;
         private TableLayoutPanel tableLayoutPanel2;
-        private TextBox tbEmail;
-        private Label lblName;
-        private Label lblEmail;
-        private TextBox tbName;
+        private TextBox tbTotalAmount;
+        private Label lblDate;
+        private Label lblTotalAmount;
         private TableLayoutPanel tableLayoutPanel3;
         private Button btnConfirm;
         private Button btnCancel;
+        private DateTimePicker dtpDate;
     }
 }

@@ -4,8 +4,8 @@ namespace CustomerOrderTracker;
 
 public partial class OrderForm : Form
 {
-	public string InputName = "";
-	public string InputEmail = "";
+	public DateTime InputDate;
+	public double InputAmount;
 	public OrderForm(bool updating)
 	{
 		InitializeComponent();
@@ -16,29 +16,29 @@ public partial class OrderForm : Form
 		btnCancel.Click += OnCancel;
 	}
 
-	public void SetTextBoxes(string name, string email)
+	public void SetInputBoxes(DateTime date, double amount)
 	{
-		tbName.Text = name;
-		tbEmail.Text = email;
+		dtpDate.Value = date;
+		tbTotalAmount.Text = amount.ToString();
 	}
 
 	private void OnConfirm(object? sender, EventArgs e)
 	{
 		// Validate
-		if (string.IsNullOrWhiteSpace(tbName.Text))
+		if (!double.TryParse(tbTotalAmount.Text, out double amt))
 		{
-			MessageBox.Show("Name cannot be empty!", "Invalid Input");
+			MessageBox.Show("Total amount must be a number", "Invalid Input");
 			return;
 		}
-		if (string.IsNullOrWhiteSpace(tbEmail.Text))
+		if (amt < 0)
 		{
-			MessageBox.Show("Email cannot be empty", "Invalid Input");
+			MessageBox.Show("Total amount cannot be less than zero", "Invalid Input");
 			return;
 		}
 
 		// Assign values
-		InputName = tbName.Text.Trim();
-		InputEmail = tbEmail.Text.Trim();
+		InputDate = dtpDate.Value;
+		InputAmount = amt;
 
 		DialogResult = DialogResult.OK;
 		Close();

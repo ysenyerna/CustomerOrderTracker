@@ -200,6 +200,7 @@ partial class ManageCustomersForm
         dgvCustomers.AllowUserToDeleteRows = false;
         dgvCustomers.AllowUserToResizeColumns = false;
         dgvCustomers.AllowUserToResizeRows = false;
+        dgvCustomers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         dgvCustomers.BackgroundColor = SystemColors.ControlLight;
         dgvCustomers.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
         dgvCustomers.Dock = DockStyle.Fill;

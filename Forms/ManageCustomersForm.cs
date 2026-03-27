@@ -13,6 +13,7 @@ public partial class ManageCustomersForm : Form
 		btnAddCustomer.Click += AddCustomer;
 		btnUpdateCustomer.Click += UpdateCustomer;
 		btnDeleteCustomer.Click += DeleteCustomer;
+		btnManageOrders.Click += OpenOrders;
 		dgvCustomers.SelectionChanged += SelectionChanged;
 		tbSearchName.TextChanged += SearchUpdated;
 
@@ -32,7 +33,6 @@ public partial class ManageCustomersForm : Form
 
 	}
 
-
 	// Events
 	private void AddCustomer(object? sender, EventArgs e)
 	{
@@ -48,8 +48,17 @@ public partial class ManageCustomersForm : Form
 
 		Customer c = new() { Name = name, Email = email};
 		using TrackerContext ctx = new();
-		ctx.Customers.Add(c);
-		ctx.SaveChanges();
+		try
+		{
+			ctx.Customers.Add(c);
+			ctx.SaveChanges();
+		} 
+		catch (Exception ex)
+		{
+			UpdateStatus("Error! Database operation failed - " + ex.Message);
+			return;
+		}
+
 		DisplayDb();
 		UpdateStatus("Customer successfully added!", Color.Green);
 	}
@@ -77,14 +86,35 @@ public partial class ManageCustomersForm : Form
 
 		// Update the customer
 		using var ctx = new TrackerContext();
-		customer = ctx.Customers.First(c => c.CustomerId == customer.CustomerId);
-		customer.Name = newName;
-		customer.Email = newEmail;
-		ctx.SaveChanges();
+		try {
+			customer = ctx.Customers.First(c => c.CustomerId == customer.CustomerId);
+			customer.Name = newName;
+			customer.Email = newEmail;
+			ctx.SaveChanges();
+		}
+		catch (Exception ex)
+		{
+			UpdateStatus("Error! Database operation failed - " + ex.Message);
+			return;
+		}
 		
 		UpdateStatus("Customer successfully updated!", Color.Green);
 		DisplayDb();
 		
+	}
+
+	private void OpenOrders(object? sender, EventArgs e)
+	{
+		var customer = GetSelectedCustomer();
+		if (customer is null)
+		{
+			UpdateStatus("Error! Failed to open orders because no customer is selected!");
+			return;
+		}
+
+		var ordersForm = new ManageOrdersForm(customer);
+		ordersForm.Show();
+
 
 	}
 
@@ -101,8 +131,15 @@ public partial class ManageCustomersForm : Form
 			return;
 
 		using TrackerContext ctx = new();
-		ctx.Customers.Remove(customer);
-		ctx.SaveChanges();
+		try {
+			ctx.Customers.Remove(customer);
+			ctx.SaveChanges();
+		}
+		catch (Exception ex)
+		{
+			UpdateStatus("Error! Database operation failed - " + ex.Message);
+			return;
+		}
 
 		UpdateStatus("Customer successfully deleted!", Color.Green);
 		DisplayDb();
@@ -151,6 +188,13 @@ public partial class ManageCustomersForm : Form
 		}
 		
 		dgvCustomers.DataSource = list;
+
+		if (dgvCustomers.Columns.Count == 3)
+		{
+			dgvCustomers.Columns["CustomerId"]?.HeaderText = "ID";
+			dgvCustomers.Columns["CustomerId"]?.FillWeight = 10;
+
+		}
 	}
 
 

@@ -27,7 +27,7 @@ public class Customer
 
 public class Order
 {
-	public required int OrderId { get; set; }
+	public int OrderId { get; set; }
 	public required DateTime OrderDate { get; set; }
 	public required double TotalAmount { get; set; }
 	// Foreign Key

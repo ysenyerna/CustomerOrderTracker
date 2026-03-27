@@ -1,132 +1,131 @@
-using System.Data;
-
 namespace CustomerOrderTracker;
 
 public partial class ManageOrdersForm : Form
 {
-    public ManageOrdersForm()
+	public Customer customer;
+    public ManageOrdersForm(Customer c)
     {
+		// Initialize values
         InitializeComponent();
+		customer = c;
 
-		// Connect events
-		btnAddCustomer.Click += AddCustomer;
-		btnUpdateCustomer.Click += UpdateCustomer;
-		btnDeleteCustomer.Click += DeleteCustomer;
-		dgvCustomers.SelectionChanged += SelectionChanged;
-		tbSearchName.TextChanged += SearchUpdated;
+		Text = $"Manage Orders for Customer [{customer.CustomerId}] ({customer.Name})";
 
-		// Initialize DB
 		DisplayDb();
 		SelectionChanged(null, null);
 
-		using var ctx = new TrackerContext();
-		var list = ctx.Customers.ToList();
-		if (list.Count == 0)
-			UpdateStatus(
-				"Initialized CustomerOrders.db database.", Color.Green);
-		else
-			UpdateStatus(
-				$"Loaded {list.Count} customers from CustomerOrders.db", Color.Green);
+		// Events
+		btnAddOrder.Click += AddOrder;
+		btnUpdateOrder.Click += UpdateOrder;
+		btnDeleteOrder.Click += DeleteOrder;
+
+		var count = dgvOrders.Rows.Count;
+		if (count > 0)
+			UpdateStatus($"{count} orders were successfully loaded.");
 
 	}
 
-
 	// Events
-	private void AddCustomer(object? sender, EventArgs e)
+	private void AddOrder(object? sender, EventArgs e)
 	{
-		var customerForm = new CustomerForm(false) {Text = "Add a New Customer"};
+		var orderForm = new OrderForm(false) {Text = "Add a New Order"};
 
-		var result = customerForm.ShowDialog();
+		var result = orderForm.ShowDialog();
 		if (result != DialogResult.OK) 
 			return;
 		
-		// Add the customer
-		var name = customerForm.InputName;
-		var email = customerForm.InputEmail;
+		// Add the order
+		var date = orderForm.InputDate;
+		var totalAmount = orderForm.InputAmount;
 
-		Customer c = new() { Name = name, Email = email};
+		Order o = new() { OrderDate = date, TotalAmount = totalAmount, CustomerId = customer.CustomerId};
 		using TrackerContext ctx = new();
-		ctx.Customers.Add(c);
-		ctx.SaveChanges();
+		try {
+			ctx.Orders.Add(o);
+			ctx.SaveChanges();
+		}
+		catch (Exception ex)
+		{
+			UpdateStatus("Error! Database operation failed - " + ex.Message);
+			return;
+		}
 		DisplayDb();
-		UpdateStatus("Customer successfully added!", Color.Green);
+		UpdateStatus("Order successfully added!", Color.Green);
 	}
 
-	private void UpdateCustomer(object? sender, EventArgs e)
+	private void UpdateOrder(object? sender, EventArgs e)
 	{
-		var customer = GetSelectedCustomer();
-		if (customer is null)
+		var order = GetSelectedOrder();
+		if (order is null)
 		{
-			UpdateStatus("Error! Failed to update customer because no customer is selected!", Color.Red);
+			UpdateStatus("Error! Failed to update order because no order is selected!", Color.Red);
 			return;
 		}
 
-		var customerForm = new CustomerForm(true) { 
-			Text = "Update a Customer", 
+		var orderForm = new OrderForm(true) { 
+			Text = "Update an Order", 
 		};
-		customerForm.SetTextBoxes(customer.Name, customer.Email);
-		var result = customerForm.ShowDialog();
+		orderForm.SetInputBoxes(order.OrderDate, order.TotalAmount);
+		var result = orderForm.ShowDialog();
 		if (result != DialogResult.OK) 
 			return;
 		
 		// Get new values
-		var newName = customerForm.InputName;
-		var newEmail = customerForm.InputEmail;
+		var newDate = orderForm.InputDate;
+		var newAmount = orderForm.InputAmount;
 
-		// Update the customer
+		// Update the order
 		using var ctx = new TrackerContext();
-		customer = ctx.Customers.First(c => c.CustomerId == customer.CustomerId);
-		customer.Name = newName;
-		customer.Email = newEmail;
-		ctx.SaveChanges();
+		try {
+			order = ctx.Orders.First(o => o.OrderId == order.OrderId);
+			order.OrderDate = newDate;
+			order.TotalAmount = newAmount;
+			ctx.SaveChanges();
+		}
+		catch (Exception ex)
+		{
+			UpdateStatus("Error! Database operation failed - " + ex.Message);
+			return;
+		}
 		
-		UpdateStatus("Customer successfully updated!", Color.Green);
+		UpdateStatus("Order successfully updated!", Color.Green);
 		DisplayDb();
-		
-
 	}
 
-	private void DeleteCustomer(object? sender, EventArgs e)
+	private void DeleteOrder(object? sender, EventArgs e)
 	{
-		var customer = GetSelectedCustomer();
-		if (customer is null)
+		var order = GetSelectedOrder();
+		if (order is null)
 		{
-			UpdateStatus("Error! Failed to delete customer because no customer is selected.", Color.Red);
+			UpdateStatus("Error! Failed to delete order because no order is selected!", Color.Red);
+			return;
+		}
+		if (!PromptConfirmation("Are you sure you wish to delete the order?"))
+			return;
+
+		using var ctx = new TrackerContext();
+		try {
+			ctx.Orders.Remove(order);
+			ctx.SaveChanges();
+		}
+		catch (Exception ex)
+		{
+			UpdateStatus("Error! Database operation failed - " + ex.Message);
 			return;
 		}
 
-		if (!PromptConfirmation("Are you sure you wish to delete this customer and all of their orders?"))
-			return;
-
-		using TrackerContext ctx = new();
-		ctx.Customers.Remove(customer);
-		ctx.SaveChanges();
-
-		UpdateStatus("Customer successfully deleted!", Color.Green);
+		UpdateStatus("Order successfully deleted!", Color.Green);
 		DisplayDb();
 	}
 
 
 	private void SelectionChanged(object? sender, EventArgs? e)
 	{
-		bool hasSelection = dgvCustomers.SelectedRows.Count != 0;
+		bool hasSelection = dgvOrders.SelectedRows.Count != 0;
 
-		btnUpdateCustomer.Enabled = hasSelection;
-		btnManageOrders.Enabled = hasSelection;
-		btnDeleteCustomer.Enabled = hasSelection;
+		btnUpdateOrder.Enabled = hasSelection;
+		btnDeleteOrder.Enabled = hasSelection;
 
-	}
-
-	private void SearchUpdated(object? sender, EventArgs e)
-	{
-		var nameQuery = tbSearchName.Text;
-		if (nameQuery == "")
-		{
-			DisplayDb();
-			return;
-		}
-
-		DisplayDb(c => c.Name.Contains(nameQuery, StringComparison.OrdinalIgnoreCase));
 	}
 
 
@@ -138,37 +137,41 @@ public partial class ManageOrdersForm : Form
 		lblStatus.Text = "Status: " + msg;
 	}
 
-	// Refreshes the list with data from the database. Specify a selector to select only items that match a condition
-	private void DisplayDb(Func<Customer, bool>? selector = null)
+	// Displays orders from the database in the data grid view
+	private void DisplayDb()
 	{
 		using TrackerContext ctx = new();
-		var list = ctx.Customers.ToList();
-		if (selector is not null)
+		dgvOrders.DataSource = ctx.Orders.ToList().Where(o => o.CustomerId == customer.CustomerId).ToList();
+
+		if (dgvOrders.Columns.Count == 4)
 		{
-			list = [.. list.Where(selector)];
+			dgvOrders.Columns["OrderId"]?.HeaderText = "ID";
+			dgvOrders.Columns["CustomerId"]?.Visible = false;
+
+			dgvOrders.Columns["OrderId"]?.FillWeight = 10;
+
 		}
-		
-		dgvCustomers.DataSource = list;
+
 	}
 
-
-	// Gets the customer in the selected row, returns null if no customer is selected
-	private Customer? GetSelectedCustomer()
+	// Gets the order in the selected row, returns null if no order is selected
+	private Order? GetSelectedOrder()
 	{
-		if (dgvCustomers.SelectedRows.Count == 0)
+		if (dgvOrders.SelectedRows.Count == 0)
 			return null;
 
-		var row = dgvCustomers.SelectedRows[0];
+		var row = dgvOrders.SelectedRows[0];
 		int id = Convert.ToInt32(row.Cells[0].Value?.ToString());
 		
 		using var ctx = new TrackerContext();
-		var customer = ctx.Customers.FirstOrDefault(c => c.CustomerId == id);
+		var order = ctx.Orders.FirstOrDefault(o => o.OrderId == id);
 
-		return customer;
+		return order;
 	}
 
 	private static bool PromptConfirmation(string message)
 		=> MessageBox.Show(message, "Confirmation", MessageBoxButtons.OKCancel) == DialogResult.OK;
+
 
 }
 
