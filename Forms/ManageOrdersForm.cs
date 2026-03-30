@@ -18,10 +18,11 @@ public partial class ManageOrdersForm : Form
 		btnAddOrder.Click += AddOrder;
 		btnUpdateOrder.Click += UpdateOrder;
 		btnDeleteOrder.Click += DeleteOrder;
+		dgvOrders.SelectionChanged += SelectionChanged;
 
 		var count = dgvOrders.Rows.Count;
 		if (count > 0)
-			UpdateStatus($"{count} orders were successfully loaded.");
+			UpdateStatus($"{count} orders were successfully loaded.", Color.Green);
 
 	}
 
